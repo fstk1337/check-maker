@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+application {
+    getMainClass().set("com.fstk1337.check.maker.CheckMaker")
+    sourceCompatibility = 17
+    targetCompatibility = 17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
+    implementation 'com.google.guava:guava:31.1-jre'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': application.getMainClass()
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
