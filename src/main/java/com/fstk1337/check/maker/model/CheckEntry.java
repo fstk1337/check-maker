@@ -5,6 +5,8 @@ import java.math.MathContext;
 import java.text.DecimalFormat;
 
 public class CheckEntry {
+	private static final double SALE_DISCOUNT = 0.1d;
+
 	private int lineNumber;
 	private Product product;
 	private int quantity;
@@ -15,7 +17,7 @@ public class CheckEntry {
 		this.lineNumber = lineNumber;
 		this.product = product;
 		this.quantity = quantity;
-		this.discount = 0.0d;
+		this.discount = product.isOnSale() ? SALE_DISCOUNT : 0.0d;
 		this.total = calculateTotal();
 	}
 
@@ -44,7 +46,7 @@ public class CheckEntry {
 	private double calculateTotal() {
 		MathContext mc = new MathContext(10);
 		BigDecimal price = new BigDecimal(product.getPrice(), mc);
-		double result = new BigDecimal(quantity).multiply(price, mc).doubleValue();
+		double result = new BigDecimal(quantity).multiply(price, mc).subtract(new BigDecimal(discount), mc).doubleValue();
 		return (double)Math.round(result * 100) / 100;
 	}
 }
