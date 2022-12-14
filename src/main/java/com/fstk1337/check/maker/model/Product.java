@@ -1,9 +1,10 @@
 package com.fstk1337.check.maker.model;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 public class Product {
-	private Long id;
+	private long id;
 	private String name;
 	private double price;
 	private boolean onSale;
@@ -29,5 +30,11 @@ public class Product {
 
 	public boolean isOnSale() {
 		return onSale;
+	}
+
+	@Override
+	public String toString() {
+		DecimalFormat df = new DecimalFormat("0.00");
+		return name + ", price: " + df.format(price) + ", onSale: " + onSale;
 	}
 }

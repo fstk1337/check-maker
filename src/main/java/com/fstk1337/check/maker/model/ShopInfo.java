@@ -28,4 +28,9 @@ public class ShopInfo {
 	public int getCashierNumber() {
 		return cashierNumber;
 	}
+
+	@Override
+	public String toString() {
+		return "Shop: " + name + "\r\naddress: " + address + "\r\ntel.: " + phoneNumber + "\r\ncashier: No." + cashierNumber + "\r\n";
+	}
 }
