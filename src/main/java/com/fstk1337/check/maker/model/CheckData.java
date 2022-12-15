@@ -17,11 +17,6 @@ public class CheckData {
 		this.discountCard = discountCard;
 	}
 
-	public CheckData(List<CheckEntry> entries) {
-		this.entries = entries;
-		this.discountCard = null;
-	}
-
 	public double getTotal() {
 		double total = calculateSubtotal().subtract(calculateDiscount(), MC).doubleValue();
 		return (double)Math.round(total * 100) / 100;

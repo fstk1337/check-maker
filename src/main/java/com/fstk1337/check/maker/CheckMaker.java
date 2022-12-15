@@ -4,6 +4,7 @@ import com.fstk1337.check.maker.model.*;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CheckMaker {
     static final ShopInfo SHOP_INFO = new ShopInfo("SUPERMEGASHOP 1337", "13-37 ELITE GOOSE STREET", "33-560-5433-243", 1486);
@@ -47,24 +48,41 @@ public class CheckMaker {
     }
 
     public static void main(String ...args) {
+        String[] productData;
+        String cardString = null;
+        if (args[args.length - 1].startsWith("card-")) {
+            productData = Arrays.copyOfRange(args, 0, args.length - 1);
+            cardString = args[args.length - 1];
+        } else {
+            productData = args;
+        }
+        List<CheckEntry> entries = createEntries(productData);
+        DiscountCard discountCard = findDiscountCard(cardString);
+        Check newCheck = new Check(SHOP_INFO, entries, TAX_RATE, discountCard);
+        System.out.println(newCheck);
+    }
+
+    private static List<CheckEntry> createEntries(String ...productData) {
         List<CheckEntry> entries = new ArrayList<>();
-        for (int i = 0; i < args.length - 1; i++) {
-            long productId = Long.parseLong(args[i].split("-")[0]);
-            int quantity = Integer.parseInt(args[i].split("-")[1]);
+        for (String item: productData) {
+            String[] data = item.split("-");
+            long productId = Long.parseLong(data[0]);
+            int quantity = Integer.parseInt(data[1]);
             Product product = PRODUCTS.stream()
                 .filter(el -> el.getId() == productId)
                 .findFirst()
                 .orElse(null);
-            entries.add(new CheckEntry((i + 1), product, quantity));
+            entries.add(new CheckEntry((entries.size() + 1), product, quantity));
         }
+        return entries;
+    }
 
-        int discountCardNumber = Integer.parseInt(args[args.length - 1].split("-")[1]);
-        DiscountCard discountCard = DISCOUNT_CARDS.stream()
+    private static DiscountCard findDiscountCard(String cardString) {
+        if (cardString == null) return null;
+        int discountCardNumber = Integer.parseInt(cardString.split("-")[1]);
+        return DISCOUNT_CARDS.stream()
             .filter(card -> card.getNumber() == discountCardNumber)
             .findFirst()
             .orElse(null);
-        
-        Check testCheck = new Check(SHOP_INFO, entries, TAX_RATE, discountCard);
-        System.out.println(testCheck);
     }
 }

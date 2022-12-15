@@ -28,15 +28,6 @@ public class Check {
 		this.total = calculateTotal();
 	}
 
-	public Check(ShopInfo shopInfo, List<CheckEntry> entries, double taxRate) {
-		this.shopInfo = shopInfo;
-		this.issued = LocalDateTime.now();
-		this.checkData = new CheckData(entries);
-		this.taxRate = taxRate;
-		this.tax = calculateTax();
-		this.total = calculateTotal();
-	}
-
 	public ShopInfo getShopInfo() {
 		return shopInfo;
 	}
