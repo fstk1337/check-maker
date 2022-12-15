@@ -17,7 +17,7 @@ public class CheckEntry {
 		this.lineNumber = lineNumber;
 		this.product = product;
 		this.quantity = quantity;
-		this.discount = product.isOnSale() ? SALE_DISCOUNT : 0.0d;
+		this.discount = 0.0d;
 		this.total = calculateTotal();
 	}
 
@@ -33,6 +33,15 @@ public class CheckEntry {
 		return quantity;
 	}
 
+	public double getDiscount() {
+		return discount;
+	}
+
+	public void updateDiscountAndTotal(double discount) {
+		this.discount = discount;
+		this.total = calculateTotal();
+	}
+
 	public double getTotal() {
 		return total;
 	}
@@ -40,7 +49,7 @@ public class CheckEntry {
 	@Override
 	public String toString() {
 		DecimalFormat df = new DecimalFormat("0.00");
-		return "[" + lineNumber + "]: " + product.toString() + ", quantity: " + quantity + ", TOTAL: " + df.format(total);
+		return "[" + lineNumber + "]: " + product.toString() + ", quantity: " + quantity + ", discount: " + df.format(discount) + ", TOTAL: " + df.format(total);
 	}
 
 	private double calculateTotal() {

@@ -19,10 +19,10 @@ public class Check {
 	private double total;
 
 
-	public Check(ShopInfo shopInfo, List<CheckEntry> entries, double taxRate, DiscountCard discountCard) {
+	public Check(ShopInfo shopInfo, List<CheckEntry> entries, double taxRate, double saleDiscountRate, DiscountCard discountCard) {
 		this.shopInfo = shopInfo;
 		this.issued = LocalDateTime.now();
-		this.checkData = new CheckData(entries, discountCard);
+		this.checkData = createCheckData(entries, discountCard, saleDiscountRate);
 		this.taxRate = taxRate;
 		this.tax = calculateTax();
 		this.total = calculateTotal();
@@ -65,6 +65,24 @@ public class Check {
 				checkData.toString() +
 				", tax: " + df.format(tax) +
 				", TOTAL: " + df.format(total);
+	}
+
+	private CheckData createCheckData(List<CheckEntry> entries, DiscountCard discountCard, double saleDiscountRate) {
+		long countOnSaleEntries = entries.stream()
+			.filter(entry -> entry.getProduct().isOnSale())
+			.count();
+		if (countOnSaleEntries > 5) {
+			BigDecimal discountRate = new BigDecimal(saleDiscountRate);
+			for (CheckEntry entry: entries) {
+				if (entry.getProduct().isOnSale()) {
+					BigDecimal total = new BigDecimal(entry.getTotal());
+					BigDecimal oldDiscount = new BigDecimal(entry.getDiscount());
+					BigDecimal newDiscount = total.add(oldDiscount).multiply(discountRate, MC).add(oldDiscount, MC);
+					entry.updateDiscountAndTotal(newDiscount.doubleValue());
+				}
+			}
+		}
+		return new CheckData(entries, discountCard);
 	}
 
 	private double calculateTax() {

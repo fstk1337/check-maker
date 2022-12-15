@@ -9,11 +9,12 @@ import java.util.Arrays;
 public class CheckMaker {
     static final ShopInfo SHOP_INFO = new ShopInfo("SUPERMEGASHOP 1337", "13-37 ELITE GOOSE STREET", "33-560-5433-243", 1486);
     static final double TAX_RATE = 0.13d;
+    static final double SALE_DISCOUNT_RATE = 0.1d;
     static final List<Product> PRODUCTS = new ArrayList<>();
     static final List<DiscountCard> DISCOUNT_CARDS = new ArrayList<>();
 
     static {
-        PRODUCTS.add(new Product(1L, "apple", 1.1d, false));
+        PRODUCTS.add(new Product(1L, "apple", 1.1d, true));
         PRODUCTS.add(new Product(2L, "banana", 2.5d, false));
         PRODUCTS.add(new Product(3L, "peach", 2.74d, false));
         PRODUCTS.add(new Product(4L, "orange", 5.2d, false));
@@ -24,20 +25,20 @@ public class CheckMaker {
         PRODUCTS.add(new Product(9L, "pomegranat", 1.41d, false));
         PRODUCTS.add(new Product(10L, "watermelon", 1.75d, false));
         PRODUCTS.add(new Product(11L, "lemon", 0.25d, false));
-        PRODUCTS.add(new Product(12L, "bread", 4.0d, false));
+        PRODUCTS.add(new Product(12L, "bread", 4.0d, true));
         PRODUCTS.add(new Product(13L, "milk", 5.4d, false));
         PRODUCTS.add(new Product(14L, "butter", 4.7d, false));
         PRODUCTS.add(new Product(15L, "ketchup", 3.2d, false));
-        PRODUCTS.add(new Product(16L, "macaroni", 2.22d, false));
+        PRODUCTS.add(new Product(16L, "macaroni", 2.22d, true));
         PRODUCTS.add(new Product(17L, "beer", 2.9d, false));
         PRODUCTS.add(new Product(18L, "salmon", 1.2d, false));
-        PRODUCTS.add(new Product(19L, "eggs", 1.31d, false));
+        PRODUCTS.add(new Product(19L, "eggs", 1.31d, true));
         PRODUCTS.add(new Product(20L, "carrot", 8.6d, false));
-        PRODUCTS.add(new Product(21L, "yogurt", 6.62d, false));
+        PRODUCTS.add(new Product(21L, "yogurt", 6.62d, true));
         PRODUCTS.add(new Product(22L, "cookies", 10.0d, false));
         PRODUCTS.add(new Product(23L, "pie", 6.1d, false));
         PRODUCTS.add(new Product(24L, "cake", 11.2d, false));
-        PRODUCTS.add(new Product(25L, "candies", 9.24d, false));
+        PRODUCTS.add(new Product(25L, "candies", 9.24d, true));
         DISCOUNT_CARDS.add(new DiscountCard(1L, 2335, 0.01d));
         DISCOUNT_CARDS.add(new DiscountCard(2L, 1337, 0.1d));
         DISCOUNT_CARDS.add(new DiscountCard(3L, 2471, 0.12d));
@@ -58,7 +59,7 @@ public class CheckMaker {
         }
         List<CheckEntry> entries = createEntries(productData);
         DiscountCard discountCard = findDiscountCard(cardString);
-        Check newCheck = new Check(SHOP_INFO, entries, TAX_RATE, discountCard);
+        Check newCheck = new Check(SHOP_INFO, entries, TAX_RATE, SALE_DISCOUNT_RATE, discountCard);
         System.out.println(newCheck);
     }
 
