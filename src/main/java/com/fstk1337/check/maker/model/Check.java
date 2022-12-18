@@ -1,11 +1,10 @@
 package com.fstk1337.check.maker.model;
 
-import com.fstk1337.check.maker.model.util.MoneyRounder;
+import com.fstk1337.check.maker.util.Money;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.math.BigDecimal;
 
 
 public class Check {
@@ -79,12 +78,14 @@ public class Check {
     }
 
     private double calculateTax() {
-        BigDecimal tax = BigDecimal.valueOf(checkData.getTaxable()).multiply(BigDecimal.valueOf(taxRate));
-        return MoneyRounder.round(tax);
+        return Money.of(checkData.getTaxable())
+                .multiply(taxRate)
+                .getAmount();
     }
 
     private double calculateTotal() {
-        BigDecimal total = BigDecimal.valueOf(checkData.getTaxable()).add(BigDecimal.valueOf(tax));
-        return MoneyRounder.round(total);
+        return Money.of(checkData.getTaxable())
+                .add(tax)
+                .getAmount();
     }
 }

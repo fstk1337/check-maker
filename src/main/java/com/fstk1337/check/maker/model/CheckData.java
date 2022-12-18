@@ -1,7 +1,6 @@
 package com.fstk1337.check.maker.model;
 
-import com.fstk1337.check.maker.model.util.MoneyRounder;
-import java.math.BigDecimal;
+import com.fstk1337.check.maker.util.Money;
 import java.util.List;
 
 
@@ -13,15 +12,15 @@ public class CheckData {
     }
 
     public double getCost() {
-        return MoneyRounder.round(calculateCost());
+        return calculateCost();
     }
 
     public double getDiscount() {
-        return MoneyRounder.round(calculateDiscount());
+        return calculateDiscount();
     }
 
     public double getTaxable() {
-        return MoneyRounder.round(calculateTaxable());
+        return calculateTaxable();
     }
 
     @Override
@@ -35,24 +34,27 @@ public class CheckData {
                 ", taxable: " + getTaxable();
     }
 
-    private BigDecimal calculateCost() {
+    private double calculateCost() {
         return entries.stream()
-                .map(entry -> BigDecimal.valueOf(entry.getProduct().price())
-                        .multiply(BigDecimal.valueOf(entry.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(entry -> Money.of(entry.getProduct().price())
+                        .multiply(entry.getQuantity()))
+                .reduce(Money.of(0), Money::add)
+                .getAmount();
     }
 
-    private BigDecimal calculateDiscount() {
+    private double calculateDiscount() {
         return entries.stream()
                 .map(CheckEntry::getDiscount)
-                .map(BigDecimal::new)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(Money::of)
+                .reduce(Money.of(0), Money::add)
+                .getAmount();
     }
 
-    private BigDecimal calculateTaxable() {
-        return entries.stream()
-                .map(CheckEntry::getTotal)
-                .map(BigDecimal::new)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    private double calculateTaxable() {
+         return entries.stream()
+                 .map(CheckEntry::getTotal)
+                 .map(Money::of)
+                 .reduce(Money.of(0), Money::add)
+                 .getAmount();
     }
 }

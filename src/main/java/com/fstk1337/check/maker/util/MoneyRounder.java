@@ -1,4 +1,4 @@
-package com.fstk1337.check.maker.model.util;
+package com.fstk1337.check.maker.util;
 
 import org.decimal4j.util.DoubleRounder;
 

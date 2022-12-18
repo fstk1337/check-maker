@@ -1,7 +1,6 @@
 package com.fstk1337.check.maker.model;
 
-import com.fstk1337.check.maker.model.util.MoneyRounder;
-import java.math.BigDecimal;
+import com.fstk1337.check.maker.util.Money;
 
 public class CheckEntry {
     private final int lineNumber;
@@ -31,20 +30,20 @@ public class CheckEntry {
     }
 
     public double getCost() {
-        return MoneyRounder.round(calculateCost());
+        return calculateCost();
     }
 
     public double getDiscount() {
         return discount;
     }
 
+    public double getTotal() {
+        return total;
+    }
+
     public void updateDiscountAndTotal(double discountRate) {
         this.discount = calculateDiscount(discountRate);
         this.total = calculateTotal();
-    }
-
-    public double getTotal() {
-        return total;
     }
 
     @Override
@@ -53,22 +52,22 @@ public class CheckEntry {
     }
 
     private double calculateCost() {
-        return BigDecimal.valueOf(product.price())
-                .multiply(BigDecimal.valueOf(quantity))
-                .doubleValue();
+        return Money.of(product.price())
+                .multiply(quantity)
+                .getAmount();
     }
 
     private double calculateDiscount(double discountRate) {
-        BigDecimal discount =  BigDecimal.valueOf(product.price())
-                .multiply(BigDecimal.valueOf(quantity))
-                .multiply(BigDecimal.valueOf(discountRate));
-        return MoneyRounder.round(discount);
+        return Money.of(product.price())
+                .multiply(quantity)
+                .multiply(discountRate)
+                .getAmount();
     }
 
     private double calculateTotal() {
-        BigDecimal total = BigDecimal.valueOf(product.price())
-                .multiply(BigDecimal.valueOf(quantity))
-                .subtract(BigDecimal.valueOf(discount));
-        return MoneyRounder.round(total);
+        return Money.of(product.price())
+                .multiply(quantity)
+                .subtract(discount)
+                .getAmount();
     }
 }

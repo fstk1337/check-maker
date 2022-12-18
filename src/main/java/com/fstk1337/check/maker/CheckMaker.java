@@ -48,43 +48,103 @@ public class CheckMaker {
         DISCOUNT_CARDS.add(new DiscountCard(7L, 9143, 0.07d));
     }
 
-    public static void main(String ...args) {
-        String[] productData;
-        String cardString = null;
-        if (args[args.length - 1].startsWith("card-")) {
-            productData = Arrays.copyOfRange(args, 0, args.length - 1);
-            cardString = args[args.length - 1];
-        } else {
-            productData = args;
-        }
-        DiscountCard discountCard = findDiscountCard(cardString);
-        double discountRate = discountCard == null ? 0.0d : discountCard.discountRate();
-        List<CheckEntry> entries = createEntries(discountRate, productData);
-        Check newCheck = new Check(SHOP_INFO, entries, TAX_RATE, SALE_DISCOUNT_RATE);
+    public static void main(String[] args) {
+        Arguments arguments = Arguments.of(args);
+        Check newCheck = createCheck(arguments.getProductData(), arguments.getCardInfo());
         System.out.println(newCheck);
     }
 
-    private static List<CheckEntry> createEntries(double discountRate, String ...productData) {
-        List<CheckEntry> entries = new ArrayList<>();
-        for (String item: productData) {
-            String[] data = item.split("-");
-            long productId = Long.parseLong(data[0]);
-            int quantity = Integer.parseInt(data[1]);
-            Product product = PRODUCTS.stream()
-                .filter(el -> el.id() == productId)
+    private static Check createCheck(String[] productData, String cardInfo) {
+        double discountRate = getDiscountRate(cardInfo);
+        List<CheckEntry> entries = createEntries(productData, discountRate);
+        return new Check(SHOP_INFO, entries, TAX_RATE, SALE_DISCOUNT_RATE);
+    }
+
+    private static double getDiscountRate(String cardInfo) {
+        double discountRate = 0.0d;
+        DiscountCard discountCard = getDiscountCard(cardInfo);
+        if (discountCard != null) {
+            discountRate = discountCard.discountRate();
+        }
+        return discountRate;
+    }
+
+    private static DiscountCard getDiscountCard(String cardInfo) {
+        if (cardInfo == null) return null;
+        int cardNumber = parseCardNumber(cardInfo);
+        return findDiscountCardByNumber(cardNumber);
+    }
+
+    private static int parseCardNumber(String cardInfo) {
+        return Integer.parseInt(cardInfo.split("-")[1]);
+    }
+
+    private static DiscountCard findDiscountCardByNumber(int cardNumber) {
+        return DISCOUNT_CARDS.stream()
+                .filter(card -> card.number() == cardNumber)
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static List<CheckEntry> createEntries(String[] productData, double discountRate) {
+        List<CheckEntry> entries = new ArrayList<>();
+        for (String productInfo: productData) {
+            long productId = parseProductId(productInfo);
+            int quantity = parseProductQuantity(productInfo);
+            Product product = findProductById(productId);
             entries.add(new CheckEntry((entries.size() + 1), product, quantity, discountRate));
         }
         return entries;
     }
 
-    private static DiscountCard findDiscountCard(String cardString) {
-        if (cardString == null) return null;
-        int discountCardNumber = Integer.parseInt(cardString.split("-")[1]);
-        return DISCOUNT_CARDS.stream()
-            .filter(card -> card.number() == discountCardNumber)
-            .findFirst()
-            .orElse(null);
+    private static long parseProductId(String productInfo) {
+        return Long.parseLong(productInfo.split("-")[0]);
+    }
+
+    private static int parseProductQuantity(String productInfo) {
+        return Integer.parseInt(productInfo.split("-")[1]);
+    }
+
+    private static Product findProductById(long productId) {
+        return PRODUCTS.stream()
+                .filter(el -> el.id() == productId)
+                .findFirst()
+                .orElse(null);
+    }
+
+    static class Arguments {
+        private final String[] productData;
+        private final String cardInfo;
+
+        private Arguments(String[] checkMakerArgs) {
+            productData = parseProductData(checkMakerArgs);
+            cardInfo = parseCardInfo(checkMakerArgs);
+        }
+
+        public static Arguments of(String[] checkMakerArgs) {
+            return new Arguments(checkMakerArgs);
+        }
+
+        public String[] getProductData() {
+            return productData;
+        }
+
+        public String getCardInfo() {
+            return cardInfo;
+        }
+
+        private String[] parseProductData(String[] args) {
+            if (args[args.length - 1].startsWith("card-")) {
+                return Arrays.copyOfRange(args, 0, args.length - 1);
+            }
+            return args;
+        }
+
+        private String parseCardInfo(String[] args) {
+            if (args[args.length - 1].startsWith("card-")) {
+                return args[args.length - 1];
+            }
+            return null;
+        }
     }
 }
