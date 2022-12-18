@@ -1,99 +1,90 @@
 package com.fstk1337.check.maker.model;
 
+import com.fstk1337.check.maker.model.util.MoneyRounder;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.text.DecimalFormat;
 
 
 public class Check {
-	private static final MathContext MC = new MathContext(10);
-
-	private ShopInfo shopInfo;
-	private LocalDateTime issued;
-	private CheckData checkData;
-	private double taxRate;
-	private double tax;
-	private double total;
+    private final ShopInfo shopInfo;
+    private final LocalDateTime issued;
+    private final CheckData checkData;
+    private final double taxRate;
+    private final double tax;
+    private final double total;
 
 
-	public Check(ShopInfo shopInfo, List<CheckEntry> entries, double taxRate, double saleDiscountRate, DiscountCard discountCard) {
-		this.shopInfo = shopInfo;
-		this.issued = LocalDateTime.now();
-		this.checkData = createCheckData(entries, discountCard, saleDiscountRate);
-		this.taxRate = taxRate;
-		this.tax = calculateTax();
-		this.total = calculateTotal();
-	}
+    public Check(ShopInfo shopInfo, List<CheckEntry> entries, double taxRate, double saleDiscountRate) {
+        this.shopInfo = shopInfo;
+        this.issued = LocalDateTime.now();
+        this.checkData = createCheckData(entries, saleDiscountRate);
+        this.taxRate = taxRate;
+        this.tax = calculateTax();
+        this.total = calculateTotal();
+    }
 
-	public ShopInfo getShopInfo() {
-		return shopInfo;
-	}
+    public ShopInfo getShopInfo() {
+        return shopInfo;
+    }
 
-	public String getCheckDate() {
-		return DateTimeFormatter.ofPattern("dd/MM/yyyy").format(issued);
-	}
+    public String getCheckDate() {
+        return DateTimeFormatter.ofPattern("dd/MM/yyyy").format(issued);
+    }
 
-	public String getCheckTime() {
-		return DateTimeFormatter.ofPattern("HH:mm:ss").format(issued);
-	}
+    public String getCheckTime() {
+        return DateTimeFormatter.ofPattern("HH:mm:ss").format(issued);
+    }
 
-	public CheckData getCheckData() {
-		return checkData;
-	}
+    public CheckData getCheckData() {
+        return checkData;
+    }
 
-	public double getTaxRate() {
-		return taxRate;
-	}
+    public double getTaxRate() {
+        return taxRate;
+    }
 
-	public double getTax() {
-		return tax;
-	}
+    public double getTax() {
+        return tax;
+    }
 
-	public double getTotal() {
-		return total;
-	}
+    public double getTotal() {
+        return total;
+    }
 
-	@Override
-	public String toString() {
-		DecimalFormat df = new DecimalFormat("0.00");
-		return shopInfo.toString() + 
-				"date: " + getCheckDate() + "\r\n" +
-				"time: " + getCheckTime() + "\r\n" + 
-				checkData.toString() +
-				", tax: " + df.format(tax) +
-				", TOTAL: " + df.format(total);
-	}
+    @Override
+    public String toString() {
+        return shopInfo.toString() +
+                "date: " + getCheckDate() + "\r\n" +
+                "time: " + getCheckTime() + "\r\n" +
+                checkData.toString() +
+                ", tax: " + tax +
+                ", TOTAL: " + total;
+    }
 
-	private CheckData createCheckData(List<CheckEntry> entries, DiscountCard discountCard, double saleDiscountRate) {
-		long countOnSaleEntries = entries.stream()
-			.filter(entry -> entry.getProduct().isOnSale())
-			.count();
-		if (countOnSaleEntries > 5) {
-			BigDecimal discountRate = new BigDecimal(saleDiscountRate);
-			for (CheckEntry entry: entries) {
-				if (entry.getProduct().isOnSale()) {
-					BigDecimal total = new BigDecimal(entry.getTotal());
-					BigDecimal oldDiscount = new BigDecimal(entry.getDiscount());
-					BigDecimal newDiscount = total.add(oldDiscount).multiply(discountRate, MC).add(oldDiscount, MC);
-					entry.updateDiscountAndTotal(newDiscount.doubleValue());
-				}
-			}
-		}
-		return new CheckData(entries, discountCard);
-	}
+    private CheckData createCheckData(List<CheckEntry> entries, double saleDiscountRate) {
+        long countOnSaleEntries = entries.stream()
+                .filter(entry -> entry.getProduct().onSale())
+                .count();
+        if (countOnSaleEntries > 5) {
+            for (CheckEntry entry: entries) {
+                if (entry.getProduct().onSale()) {
+                    entry.updateDiscountAndTotal(saleDiscountRate);
+                }
+            }
+        }
+        return new CheckData(entries);
+    }
 
-	private double calculateTax() {
-		BigDecimal taxable = new BigDecimal(checkData.getTotal());
-		double tax = taxable.multiply(new BigDecimal(taxRate), MC).doubleValue();
-		return (double)Math.round(tax * 100) / 100;
-	}
+    private double calculateTax() {
+        BigDecimal tax = BigDecimal.valueOf(checkData.getTaxable()).multiply(BigDecimal.valueOf(taxRate));
+        return MoneyRounder.round(tax);
+    }
 
-	private double calculateTotal() {
-		BigDecimal taxable = new BigDecimal(checkData.getTotal());
-		double result = taxable.add(new BigDecimal(tax), MC).doubleValue();
-		return (double)Math.round(result * 100) / 100;
-	}
+    private double calculateTotal() {
+        BigDecimal total = BigDecimal.valueOf(checkData.getTaxable()).add(BigDecimal.valueOf(tax));
+        return MoneyRounder.round(total);
+    }
 }

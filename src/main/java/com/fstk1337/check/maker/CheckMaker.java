@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class CheckMaker {
-    static final ShopInfo SHOP_INFO = new ShopInfo("SUPERMEGASHOP 1337", "13-37 ELITE GOOSE STREET", "33-560-5433-243", 1486);
-    static final double TAX_RATE = 0.13d;
-    static final double SALE_DISCOUNT_RATE = 0.1d;
+    static final ShopInfo SHOP_INFO = new ShopInfo("SUPERMASSIVE SHOP 1337", "13-37 ELITE GOOSE STREET", "33-560-5433-243", 1486);
+    static final double TAX_RATE = 0.20d;
+    static final double SALE_DISCOUNT_RATE = 0.10d;
     static final List<Product> PRODUCTS = new ArrayList<>();
     static final List<DiscountCard> DISCOUNT_CARDS = new ArrayList<>();
 
@@ -22,7 +22,7 @@ public class CheckMaker {
         PRODUCTS.add(new Product(6L, "tomato", 7.33d, false));
         PRODUCTS.add(new Product(7L, "potato", 3.0d, false));
         PRODUCTS.add(new Product(8L, "pineapple", 3.8d, false));
-        PRODUCTS.add(new Product(9L, "pomegranat", 1.41d, false));
+        PRODUCTS.add(new Product(9L, "pomegranate", 1.41d, false));
         PRODUCTS.add(new Product(10L, "watermelon", 1.75d, false));
         PRODUCTS.add(new Product(11L, "lemon", 0.25d, false));
         PRODUCTS.add(new Product(12L, "bread", 4.0d, true));
@@ -39,13 +39,13 @@ public class CheckMaker {
         PRODUCTS.add(new Product(23L, "pie", 6.1d, false));
         PRODUCTS.add(new Product(24L, "cake", 11.2d, false));
         PRODUCTS.add(new Product(25L, "candies", 9.24d, true));
-        DISCOUNT_CARDS.add(new DiscountCard(1L, 2335, 0.01d));
-        DISCOUNT_CARDS.add(new DiscountCard(2L, 1337, 0.1d));
-        DISCOUNT_CARDS.add(new DiscountCard(3L, 2471, 0.12d));
-        DISCOUNT_CARDS.add(new DiscountCard(4L, 7544, 0.05d));
-        DISCOUNT_CARDS.add(new DiscountCard(5L, 3971, 0.33d));
-        DISCOUNT_CARDS.add(new DiscountCard(6L, 1124, 0.2d));
-        DISCOUNT_CARDS.add(new DiscountCard(7L, 9143, 0.03d));
+        DISCOUNT_CARDS.add(new DiscountCard(1L, 2335, 0.02d));
+        DISCOUNT_CARDS.add(new DiscountCard(2L, 1337, 0.05d));
+        DISCOUNT_CARDS.add(new DiscountCard(3L, 2471, 0.04d));
+        DISCOUNT_CARDS.add(new DiscountCard(4L, 7544, 0.01d));
+        DISCOUNT_CARDS.add(new DiscountCard(5L, 3971, 0.03d));
+        DISCOUNT_CARDS.add(new DiscountCard(6L, 1124, 0.08d));
+        DISCOUNT_CARDS.add(new DiscountCard(7L, 9143, 0.07d));
     }
 
     public static void main(String ...args) {
@@ -57,23 +57,24 @@ public class CheckMaker {
         } else {
             productData = args;
         }
-        List<CheckEntry> entries = createEntries(productData);
         DiscountCard discountCard = findDiscountCard(cardString);
-        Check newCheck = new Check(SHOP_INFO, entries, TAX_RATE, SALE_DISCOUNT_RATE, discountCard);
+        double discountRate = discountCard == null ? 0.0d : discountCard.discountRate();
+        List<CheckEntry> entries = createEntries(discountRate, productData);
+        Check newCheck = new Check(SHOP_INFO, entries, TAX_RATE, SALE_DISCOUNT_RATE);
         System.out.println(newCheck);
     }
 
-    private static List<CheckEntry> createEntries(String ...productData) {
+    private static List<CheckEntry> createEntries(double discountRate, String ...productData) {
         List<CheckEntry> entries = new ArrayList<>();
         for (String item: productData) {
             String[] data = item.split("-");
             long productId = Long.parseLong(data[0]);
             int quantity = Integer.parseInt(data[1]);
             Product product = PRODUCTS.stream()
-                .filter(el -> el.getId() == productId)
+                .filter(el -> el.id() == productId)
                 .findFirst()
                 .orElse(null);
-            entries.add(new CheckEntry((entries.size() + 1), product, quantity));
+            entries.add(new CheckEntry((entries.size() + 1), product, quantity, discountRate));
         }
         return entries;
     }
@@ -82,7 +83,7 @@ public class CheckMaker {
         if (cardString == null) return null;
         int discountCardNumber = Integer.parseInt(cardString.split("-")[1]);
         return DISCOUNT_CARDS.stream()
-            .filter(card -> card.getNumber() == discountCardNumber)
+            .filter(card -> card.number() == discountCardNumber)
             .findFirst()
             .orElse(null);
     }
