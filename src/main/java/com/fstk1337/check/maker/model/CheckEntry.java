@@ -3,22 +3,16 @@ package com.fstk1337.check.maker.model;
 import com.fstk1337.check.maker.util.money.Money;
 
 public class CheckEntry {
-    private final int lineNumber;
     private final Product product;
     private final int quantity;
     private double discount;
     private double total;
 
-    public CheckEntry(int lineNumber, Product product, int quantity, double discountRate) {
-        this.lineNumber = lineNumber;
+    public CheckEntry(Product product, int quantity, double discountRate) {
         this.product = product;
         this.quantity = quantity;
         this.discount = calculateDiscount(discountRate);
         this.total = calculateTotal();
-    }
-
-    public int getLineNumber() {
-        return lineNumber;
     }
 
     public Product getProduct() {
@@ -44,11 +38,6 @@ public class CheckEntry {
     public void updateDiscountAndTotal(double discountRate) {
         this.discount = calculateDiscount(discountRate);
         this.total = calculateTotal();
-    }
-
-    @Override
-    public String toString() {
-        return "[" + lineNumber + "]: " + product.toString() + ", quantity: " + quantity + ", cost: " + getCost() + ", discount: " + discount + ", TOTAL: " + total;
     }
 
     private double calculateCost() {

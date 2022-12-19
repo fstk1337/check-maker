@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 public class CheckTable {
     private static final String[] HEADERS = {"QTY", "DESCRIPTION", "PRICE", "DSCNT", "TOTAL"};
+    private static final String MONEY_FORMAT = "$%.2f";
     private final List<String[]> lines;
 
     public CheckTable(List<CheckEntry> entries) {
@@ -30,9 +31,9 @@ public class CheckTable {
     private String[] parseCheckEntryToLine(CheckEntry entry) {
         String quantity = String.valueOf(entry.getQuantity());
         String description = entry.getProduct().name();
-        String price = String.format("$%.2f", entry.getProduct().price());
-        String discount = String.format("$%.2f", entry.getDiscount());
-        String total = String.format("$%.2f", entry.getTotal());
+        String price = String.format(MONEY_FORMAT, entry.getProduct().price());
+        String discount = String.format(MONEY_FORMAT, entry.getDiscount());
+        String total = String.format(MONEY_FORMAT, entry.getTotal());
         return new String[]{quantity, description, price, discount, total};
     }
 }

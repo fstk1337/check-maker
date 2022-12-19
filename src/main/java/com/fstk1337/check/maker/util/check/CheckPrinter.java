@@ -10,6 +10,7 @@ import java.util.List;
 public class CheckPrinter {
     private static final int LINE_LENGTH = 60;
     private final CheckPrintable check;
+    private final StringBuilder buffer = new StringBuilder();
 
     private CheckPrinter(CheckPrintable check) {
         this.check = check;
@@ -19,38 +20,55 @@ public class CheckPrinter {
         return new CheckPrinter(new CheckPrintable(check));
     }
 
-    public void printAtConsole() {
-        printHeader();
-        printSeparator();
-        printTable();
-        printSeparator();
-        printTotals();
+    public void printToConsole() {
+        fillBuffer();
+        System.out.println(buffer);
+        clearBuffer();
     }
 
-    private void printSeparator() {
-        printNChars('-', LINE_LENGTH);
-        newLine();
+    private void fillBuffer() {
+        addHeader();
+        addSeparator();
+        addTable();
+        addSeparator();
+        addTotals();
     }
 
-    private void printHeader() {
+    private void clearBuffer() {
+        buffer.setLength(0);
+    }
+
+    private void addSeparator() {
+        addNChars('-', LINE_LENGTH);
+        addNewLine();
+    }
+
+    private void addHeader() {
         CheckHeader header = check.getHeader();
-        printCenterLine(header.getHeading());
-        printCenterLine(header.getShopName());
-        printCenterLine(header.getShopAddress());
-        printCenterLine(header.getShopPhoneNumber());
-        newLine();
-        print(header.getCashierInfo());
-        printIndent(header.getCheckDate(), LINE_LENGTH - 32);
-        printIndent(header.getCheckTime(), LINE_LENGTH - 32 + header.getCheckDate().length());
+        addCenterLine(header.getHeading());
+        addCenterLine(header.getShopName());
+        addCenterLine(header.getShopAddress());
+        addCenterLine(header.getShopPhoneNumber());
+        addNewLine();
+        add(header.getCashierInfo());
+        addIndent(header.getCheckDate(), LINE_LENGTH - 32);
+        addIndent(header.getCheckTime(), LINE_LENGTH - 32 + header.getCheckDate().length());
     }
 
-    private void printTable() {
+    private void addTable() {
         CheckTable table = check.getTable();
         int[] maxChars = calculateMaxChars(table);
         int freeSpace = calculateFreeSpace(maxChars);
-        printTableHeaders(table.getHeaders(), freeSpace, maxChars);
-        newLine();
-        printTableLines(table.getLines(), freeSpace, maxChars);
+        addTableHeaders(table.getHeaders(), freeSpace, maxChars);
+        addNewLine();
+        addTableLines(table.getLines(), freeSpace, maxChars);
+    }
+
+    private void addTotals() {
+        CheckTotals totals = check.getTotals();
+        addLeftRight(totals.getTaxableHeading(), totals.getTaxable());
+        addLeftRight(totals.getTaxHeading(), totals.getTax());
+        addLeftRight(totals.getTotalHeading(), totals.getTotal());
     }
 
     private int[] calculateMaxChars(CheckTable table) {
@@ -77,84 +95,82 @@ public class CheckPrinter {
                 .reduce(LINE_LENGTH, (total, next) -> total - next);
     }
 
-    private void printTableHeaders(String[] headers, int freeSpace, int[] maxChars) {
-        printTableLine(headers, freeSpace, maxChars);
+    private void addTableHeaders(String[] headers, int freeSpace, int[] maxChars) {
+        addTableLine(headers, freeSpace, maxChars);
     }
 
-    private void printTableLines(List<String[]> lines, int freeSpace, int[] maxChars) {
-        lines.forEach(line -> printTableLine(line, freeSpace, maxChars));
-        newLine();
+    private void addTableLines(List<String[]> lines, int freeSpace, int[] maxChars) {
+        lines.forEach(line -> addTableLine(line, freeSpace, maxChars));
+        addNewLine();
     }
 
-    private void printTableLine(String[] line, int freeSpace, int[] maxChars) {
+    private void addTableLine(String[] line, int freeSpace, int[] maxChars) {
         int indent = freeSpace / (maxChars.length - 1);
         for (int i = 0; i < line.length - 1; i++) {
             String item = line[i];
             int chars = maxChars[i];
             if (i == 0) {
-                printCenter(item, chars);
+                addCenter(item, chars);
             } else {
-                printNChars(' ', indent);
+                addNChars(' ', indent);
                 freeSpace -= indent;
             }
             if (i == 1) {
-                printLeft(item, chars);
+                addLeft(item, chars);
             }
             if (i > 1) {
-                printRight(item, chars);
+                addRight(item, chars);
             }
         }
-        printRight(line[line.length - 1], maxChars[line.length - 1] + freeSpace);
-        newLine();
+        addRight(line[line.length - 1], maxChars[line.length - 1] + freeSpace);
+        addNewLine();
     }
 
-    private void printTotals() {
-        CheckTotals totals = check.getTotals();
-        printLeftRight(totals.getTaxableHeading(), totals.getTaxable());
-        printLeftRight(totals.getTaxHeading(), totals.getTax());
-        printLeftRight(totals.getTotalHeading(), totals.getTotal());
+    private void addNChars(char chr, int N) {
+        buffer.append(String.valueOf(chr).repeat(N));
     }
 
-    private void printNChars(char chr, int N) {
-        System.out.print(String.valueOf(chr).repeat(N));
+    private void add(String chars) {
+        buffer.append(chars);
     }
 
-    private void newLine() {
-        System.out.println();
+    private void addNewLine() {
+        buffer.append(System.lineSeparator());
     }
 
-    private void print(String chars) {
-        System.out.print(chars);
+    private void addLine(String chars) {
+        add(chars);
+        addNewLine();
     }
 
-    private void printIndent(String chars, int indent) {
-        printNChars(' ', indent);
-        System.out.println(chars);
+    private void addIndent(String chars, int indent) {
+        addNChars(' ', indent);
+        addLine(chars);
     }
 
-    private void printLeftRight(String leftChars, String rightChars) {
+    private void addLeftRight(String leftChars, String rightChars) {
         int indent = LINE_LENGTH - leftChars.length() - rightChars.length();
-        print(leftChars);
-        printIndent(rightChars, indent);
+        add(leftChars);
+        addIndent(rightChars, indent);
     }
 
-    private void printRight(String chars, int maxChars) {
+    private void addRight(String chars, int maxChars) {
         String charsToPrint = chars.length() > maxChars ? chars.substring(0, maxChars) : chars;
         while (charsToPrint.length() < maxChars) {
             charsToPrint = " ".concat(charsToPrint);
         }
-        print(charsToPrint);
+        add(charsToPrint);
     }
 
-    private void printLeft(String chars, int maxChars) {
+    private void addLeft(String chars, int maxChars) {
         String charsToPrint = chars.length() > maxChars ? chars.substring(0, maxChars) : chars;
         while (charsToPrint.length() < maxChars) {
             charsToPrint = charsToPrint.concat(" ");
         }
-        print(charsToPrint);
+        add(charsToPrint);
     }
 
-    private void printCenter(String chars, int maxChars) {
+    private void addCenter(String chars, int maxChars) {
         String charsToPrint = chars.length() > maxChars ? chars.substring(0, maxChars) : chars;
         while (charsToPrint.length() < maxChars) {
             if (maxChars - charsToPrint.length() == 1) {
@@ -163,11 +179,11 @@ public class CheckPrinter {
                 charsToPrint = " ".concat(charsToPrint).concat(" ");
             }
         }
-        print(charsToPrint);
+        add(charsToPrint);
     }
 
-    private void printCenterLine(String chars) {
+    private void addCenterLine(String chars) {
         int indent = (LINE_LENGTH - chars.length()) / 2;
-        printIndent(chars, indent);
+        addIndent(chars, indent);
     }
 }

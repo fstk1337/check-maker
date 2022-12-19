@@ -18,17 +18,6 @@ public record CheckData(List<CheckEntry> entries) {
         return calculateTaxable();
     }
 
-    @Override
-    public String toString() {
-        String info = entries.stream()
-                .map(CheckEntry::toString)
-                .reduce("", (result, next) -> result + next + "\r\n");
-        return info +
-                "cost: " + getCost() +
-                ", discount: " + getDiscount() +
-                ", taxable: " + getTaxable();
-    }
-
     private double calculateCost() {
         return entries.stream()
                 .map(entry -> Money.of(entry.getProduct().price())

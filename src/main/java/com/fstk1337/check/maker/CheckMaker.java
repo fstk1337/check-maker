@@ -52,7 +52,7 @@ public class CheckMaker {
     public static void main(String[] args) {
         Arguments arguments = Arguments.of(args);
         Check newCheck = createCheck(arguments.getProductData(), arguments.getCardInfo());
-        CheckPrinter.of(newCheck).printAtConsole();
+        CheckPrinter.of(newCheck).printToConsole();
     }
 
     private static Check createCheck(String[] productData, String cardInfo) {
@@ -93,7 +93,7 @@ public class CheckMaker {
             long productId = parseProductId(productInfo);
             int quantity = parseProductQuantity(productInfo);
             Product product = findProductById(productId);
-            entries.add(new CheckEntry((entries.size() + 1), product, quantity, discountRate));
+            entries.add(new CheckEntry(product, quantity, discountRate));
         }
         return entries;
     }

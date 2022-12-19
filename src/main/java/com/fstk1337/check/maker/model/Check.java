@@ -7,13 +7,13 @@ import java.util.List;
 
 
 public class Check {
+    private static final long ENTRIES_TO_APPLY_SALE_DISCOUNT = 5L;
     private final ShopInfo shopInfo;
     private final LocalDateTime issued;
     private final CheckData checkData;
     private final double taxRate;
     private final double tax;
     private final double total;
-
 
     public Check(ShopInfo shopInfo, List<CheckEntry> entries, double taxRate, double saleDiscountRate) {
         this.shopInfo = shopInfo;
@@ -48,27 +48,22 @@ public class Check {
         return total;
     }
 
-    @Override
-    public String toString() {
-        return shopInfo.toString() +
-                "issued: " + getIssued() + "\r\n" +
-                checkData.toString() +
-                ", tax: " + tax +
-                ", TOTAL: " + total;
-    }
-
     private CheckData createCheckData(List<CheckEntry> entries, double saleDiscountRate) {
-        long countOnSaleEntries = entries.stream()
+        long onSaleEntriesCount = entries.stream()
                 .filter(entry -> entry.getProduct().onSale())
                 .count();
-        if (countOnSaleEntries > 5) {
-            for (CheckEntry entry: entries) {
-                if (entry.getProduct().onSale()) {
-                    entry.updateDiscountAndTotal(saleDiscountRate);
-                }
-            }
+        if (onSaleEntriesCount > ENTRIES_TO_APPLY_SALE_DISCOUNT) {
+            updateEntries(entries, saleDiscountRate);
         }
         return new CheckData(entries);
+    }
+
+    private void updateEntries(List<CheckEntry> entries, double saleDiscountRate) {
+        for (CheckEntry entry: entries) {
+            if (entry.getProduct().onSale()) {
+                entry.updateDiscountAndTotal(saleDiscountRate);
+            }
+        }
     }
 
     private double calculateTax() {
