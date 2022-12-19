@@ -2,6 +2,9 @@ package com.fstk1337.check.maker.util.check;
 
 import com.fstk1337.check.maker.model.Check;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -24,6 +27,20 @@ public class CheckPrinter {
         fillBuffer();
         System.out.println(buffer);
         clearBuffer();
+    }
+
+    public void printToFile(String fileName) {
+        fillBuffer();
+        printCheckToFile(fileName);
+        clearBuffer();
+    }
+
+    private void printCheckToFile(String fileName) {
+        try {
+            Files.write(Paths.get(fileName), buffer.toString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void fillBuffer() {

@@ -53,6 +53,7 @@ public class CheckMaker {
         Arguments arguments = Arguments.of(args);
         Check newCheck = createCheck(arguments.getProductData(), arguments.getCardInfo());
         CheckPrinter.of(newCheck).printToConsole();
+        CheckPrinter.of(newCheck).printToFile("check.txt");
     }
 
     private static Check createCheck(String[] productData, String cardInfo) {
