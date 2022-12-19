@@ -60,10 +60,14 @@ public class CheckPrinter {
         int[] maxChars = new int[size];
         for (int i = 0; i < size; i++) {
             int id = i;
-            maxChars[id] = allLines.stream()
+            int max = allLines.stream()
                     .map(line -> line[id].length())
                     .max(Comparator.comparingInt(a -> a))
                     .get();
+            if (id == 1) {
+                max = Math.min(LINE_LENGTH - 30, max);
+            }
+            maxChars[id] = max;
         }
         return maxChars;
     }
