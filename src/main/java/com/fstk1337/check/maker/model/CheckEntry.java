@@ -1,6 +1,6 @@
 package com.fstk1337.check.maker.model;
 
-import com.fstk1337.check.maker.util.Money;
+import com.fstk1337.check.maker.util.money.Money;
 
 public class CheckEntry {
     private final int lineNumber;

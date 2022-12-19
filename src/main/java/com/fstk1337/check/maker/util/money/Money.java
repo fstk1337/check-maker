@@ -1,7 +1,6 @@
-package com.fstk1337.check.maker.util;
+package com.fstk1337.check.maker.util.money;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 public class Money {
     private BigDecimal amount;
@@ -13,6 +12,7 @@ public class Money {
     public Money(long amount) {
         this.amount = BigDecimal.valueOf(amount);
     }
+
     public static Money of(double amount) {
         return new Money(amount);
     }
@@ -47,11 +47,6 @@ public class Money {
 
     public Money multiply(int multiplicand) {
         amount = amount.multiply(BigDecimal.valueOf(multiplicand));
-        return this;
-    }
-
-    public Money divide(double divisor) {
-        amount = amount.divide(BigDecimal.valueOf(divisor), RoundingMode.HALF_UP);
         return this;
     }
 

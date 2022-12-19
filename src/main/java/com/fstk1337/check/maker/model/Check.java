@@ -1,9 +1,8 @@
 package com.fstk1337.check.maker.model;
 
-import com.fstk1337.check.maker.util.Money;
+import com.fstk1337.check.maker.util.money.Money;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -29,12 +28,8 @@ public class Check {
         return shopInfo;
     }
 
-    public String getCheckDate() {
-        return DateTimeFormatter.ofPattern("dd/MM/yyyy").format(issued);
-    }
-
-    public String getCheckTime() {
-        return DateTimeFormatter.ofPattern("HH:mm:ss").format(issued);
+    public LocalDateTime getIssued() {
+        return issued;
     }
 
     public CheckData getCheckData() {
@@ -56,8 +51,7 @@ public class Check {
     @Override
     public String toString() {
         return shopInfo.toString() +
-                "date: " + getCheckDate() + "\r\n" +
-                "time: " + getCheckTime() + "\r\n" +
+                "issued: " + getIssued() + "\r\n" +
                 checkData.toString() +
                 ", tax: " + tax +
                 ", TOTAL: " + total;

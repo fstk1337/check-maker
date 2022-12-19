@@ -1,15 +1,10 @@
 package com.fstk1337.check.maker.model;
 
-import com.fstk1337.check.maker.util.Money;
+import com.fstk1337.check.maker.util.money.Money;
 import java.util.List;
 
 
-public class CheckData {
-    private final List<CheckEntry> entries;
-
-    public CheckData(List<CheckEntry> entries) {
-        this.entries = entries;
-    }
+public record CheckData(List<CheckEntry> entries) {
 
     public double getCost() {
         return calculateCost();
@@ -28,7 +23,7 @@ public class CheckData {
         String info = entries.stream()
                 .map(CheckEntry::toString)
                 .reduce("", (result, next) -> result + next + "\r\n");
-        return 	info +
+        return info +
                 "cost: " + getCost() +
                 ", discount: " + getDiscount() +
                 ", taxable: " + getTaxable();
@@ -51,10 +46,10 @@ public class CheckData {
     }
 
     private double calculateTaxable() {
-         return entries.stream()
-                 .map(CheckEntry::getTotal)
-                 .map(Money::of)
-                 .reduce(Money.of(0), Money::add)
-                 .getAmount();
+        return entries.stream()
+                .map(CheckEntry::getTotal)
+                .map(Money::of)
+                .reduce(Money.of(0), Money::add)
+                .getAmount();
     }
 }

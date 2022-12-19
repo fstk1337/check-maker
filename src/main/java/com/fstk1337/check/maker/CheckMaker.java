@@ -1,6 +1,7 @@
 package com.fstk1337.check.maker;
 
 import com.fstk1337.check.maker.model.*;
+import com.fstk1337.check.maker.util.check.CheckPrinter;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class CheckMaker {
     public static void main(String[] args) {
         Arguments arguments = Arguments.of(args);
         Check newCheck = createCheck(arguments.getProductData(), arguments.getCardInfo());
-        System.out.println(newCheck);
+        CheckPrinter.of(newCheck).printAtConsole();
     }
 
     private static Check createCheck(String[] productData, String cardInfo) {
