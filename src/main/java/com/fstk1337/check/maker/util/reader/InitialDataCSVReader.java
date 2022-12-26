@@ -1,4 +1,4 @@
-package com.fstk1337.check.maker.util.csv;
+package com.fstk1337.check.maker.util.reader;
 
 import com.fstk1337.check.maker.model.DiscountCard;
 import com.fstk1337.check.maker.model.Product;
@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;

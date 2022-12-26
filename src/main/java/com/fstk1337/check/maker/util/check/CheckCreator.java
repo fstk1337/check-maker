@@ -10,13 +10,9 @@ public class CheckCreator {
     private final List<Product> products;
     private final List<DiscountCard> discountCards;
 
-    private CheckCreator(List<Product> products, List<DiscountCard> discountCards) {
+    public CheckCreator(List<Product> products, List<DiscountCard> discountCards) {
         this.products = products;
         this.discountCards = discountCards;
-    }
-
-    public static CheckCreator of(List<Product> products, List<DiscountCard> discountCards) {
-        return new CheckCreator(products, discountCards);
     }
 
     public Check createCheck(Arguments arguments, CheckOptions options) {
