@@ -17,6 +17,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
     implementation 'com.google.guava:guava:31.1-jre'
     implementation 'org.decimal4j:decimal4j:1.0.3'
+    implementation 'com.opencsv:opencsv:5.7.1'
 }
 
 jar {

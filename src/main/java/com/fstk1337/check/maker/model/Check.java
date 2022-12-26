@@ -15,11 +15,11 @@ public class Check {
     private final double tax;
     private final double total;
 
-    public Check(ShopInfo shopInfo, List<CheckEntry> entries, double taxRate, double saleDiscountRate) {
-        this.shopInfo = shopInfo;
+    public Check(CheckOptions options, List<CheckEntry> entries) {
+        this.shopInfo = options.SHOP_INFO();
         this.issued = LocalDateTime.now();
-        this.checkData = createCheckData(entries, saleDiscountRate);
-        this.taxRate = taxRate;
+        this.checkData = createCheckData(entries, options.SALE_DISCOUNT_RATE());
+        this.taxRate = options.TAX_RATE();
         this.tax = calculateTax();
         this.total = calculateTotal();
     }
